@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id          Int           @id @default(autoincrement())
+  status      Boolean       @default(false)
+  title       String
+  description String
+  grouped     Boolean       @default(false)
+  event_group Event_Group[]
+  participant Participant[]
+
+  @@map("event")
+}
+
+model Event_Group {
+  id          Int           @id @default(autoincrement())
+  event_id    Int
+  name        String
+  event       Event?        @relation(fields: [event_id], references: [id])
+  participant Participant[]
+
+  @@map("event-group")
+}
+
+model Participant {
+  id          Int          @id @default(autoincrement())
+  event_id    Int
+  event_group Int
+  name        String
+  cpf         String
+  matched     String       @default("")
+  event       Event?       @relation(fields: [event_id], references: [id])
+  group       Event_Group? @relation(fields: [event_group], references: [id])
+
+  @@map("participant")
+}
