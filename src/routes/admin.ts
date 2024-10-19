@@ -1,9 +1,11 @@
 import { Router } from "express"
 import * as auth from '../controllers/auth'
+import * as event from '../controllers/events'
 
 const router = Router()
 
-router.get('/ping', auth.validate, (req, res) => res.json({ pong: true, admin: true }))
+router.get('/ping', auth.validate, (_, res) => res.json({ pong: true, admin: true }))
+router.get('/events', auth.validate, event.getAll)
 router.post('/login', auth.login)
 
 export default router
