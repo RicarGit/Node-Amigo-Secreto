@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import https from 'https'
 import http from 'http'
-import router from './routes'
+import siteRoutes from './routes/site'
 import { requestLog } from './middleware/request-Intercepter'
 
 const app = express()
@@ -12,7 +12,8 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.all('*', requestLog)
-app.use(router)
+
+app.use('/ping', siteRoutes)
 
 const runServer = (port: number, server: http.Server) => {
   server.listen(port, () => console.log(`Server running on port ${port} - http://localhost:3000/`))
