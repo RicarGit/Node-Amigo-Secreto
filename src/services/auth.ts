@@ -5,3 +5,7 @@ export const validatePassword = (password: string) => {
   return password === currentPassword
 }
 
+export const createToken = () => {
+  const currentPassword = getToday().split('/').join('')
+  return `${process.env.DEFAULT_TOKEN}${currentPassword}`
+}
