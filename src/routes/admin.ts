@@ -6,8 +6,12 @@ const router = Router()
 
 router.get('/ping', auth.validate, (_, res) => res.json({ pong: true, admin: true }))
 
+router.post('/login', auth.login)
+
 router.get('/events', auth.validate, event.getAllEvents)
 router.post('/events', auth.validate, event.createEvent)
 router.get('/events/:id', auth.validate, event.getOneEvent)
+router.put('/events/:id', auth.validate, event.updateEvent)
+
 
 export default router
