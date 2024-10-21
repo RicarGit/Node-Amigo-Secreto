@@ -3,6 +3,13 @@ import client from "../lib/prisma-client"
 
 type CreateEventPayload = Pick<Prisma.EventCreateInput, 'title' | 'description'>
 
+type UpdateEventPayload = {
+  status?: boolean
+  title?: string
+  description?: string
+  grouped?: boolean
+}
+
 export const getAll = () => {
   const response = client.event.findMany()
     .then(data => ({ status: 200, data }))
@@ -23,6 +30,14 @@ export const create = (event: CreateEventPayload) => {
   const response = client.event.create({ data: event })
     .then(data => ({ status: 200, data }))
     .catch(() => ({ status: 400, data: { error: 'Ocorreu um erro ao cadastrar.' } }))
+
+  return response
+}
+
+export const update = (id: number, eventPayload: UpdateEventPayload) => {
+  const response = client.event.update({ where: { id }, data: eventPayload })
+    .then(data => ({ status: 200, data }))
+    .catch(() => ({ status: 400, data: { error: 'Ocorreu um erro ao atualizar.' } }))
 
   return response
 }
