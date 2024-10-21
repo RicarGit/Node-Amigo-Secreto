@@ -32,3 +32,26 @@ export const createEvent: RequestHandler = async (req, res) => {
 
   res.status(201).json({ message: 'Evento criado com sucesso.', event: newEvent })
 }
+
+export const updateEvent: RequestHandler = async (req, res) => {
+  const updateEventSchema = z.object({
+    status: z.boolean().optional(),
+    title: z.string().optional(),
+    description: z.string().optional(),
+    grouped: z.boolean().optional()
+  }).refine(body => Object.keys(body).length > 0)
+
+  const eventIdSchema = z.coerce.number()
+
+  const parsedId = eventIdSchema.safeParse(req.params.id)
+  const parsedBody = updateEventSchema.safeParse(req.body)
+
+  if (!parsedId.success) return res.status(400).json({ error: "Não foi fornecido o id do evento." })
+  if (!parsedBody.success) return res.status(400).json({ error: "Dados incorretos ou inexistentes." })
+
+  const updatedEvent = await events.update(parsedId.data, parsedBody.data)
+
+  if (updatedEvent.status === 400) return res.status(updatedEvent.status).json({ error: updatedEvent.data })
+
+  res.status(200).json({ message: "Evento atualizado com sucesso.", event: updatedEvent.data })
+}
