@@ -6,3 +6,11 @@ export const getAll: RequestHandler = async (_, res) => {
 
   res.status(status).json({ ...data })
 }
+
+export const getOneEvent: RequestHandler = async (req, res) => {
+  const id = Number(req.params.id)
+  const { status, data } = await events.getOne(id)
+
+  res.status(status).json({ ...data })
+}
+
