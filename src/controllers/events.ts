@@ -2,7 +2,7 @@ import { RequestHandler } from "express"
 import * as events from '../services/events'
 import { z } from "zod"
 
-export const getAll: RequestHandler = async (_, res) => {
+export const getAllEvents: RequestHandler = async (_, res) => {
   const { status, data } = await events.getAll()
 
   res.status(status).json({ ...data })
