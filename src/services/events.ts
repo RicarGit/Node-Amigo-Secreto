@@ -41,3 +41,11 @@ export const update = (id: number, eventPayload: UpdateEventPayload) => {
 
   return response
 }
+
+export const remove = (id: number) => {
+  const response = client.event.delete({ where: { id } })
+    .then(data => ({ status: 200, data }))
+    .catch(() => ({ status: 400, data: { error: 'Ocorreu um erro ao deletar.' } }))
+
+  return response
+}
