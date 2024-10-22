@@ -53,5 +53,15 @@ export const updateEvent: RequestHandler = async (req, res) => {
 
   if (updatedEvent.status === 400) return res.status(updatedEvent.status).json({ error: updatedEvent.data })
 
-  res.status(200).json({ message: "Evento atualizado com sucesso.", event: updatedEvent.data })
+export const deleteEvent: RequestHandler = async (req, res) => {
+  const eventIdSchema = z.coerce.number()
+  const parsedId = eventIdSchema.safeParse(req.params.id)
+
+  if (!parsedId.success) return res.status(400).json({ error: 'Dados inválidos.' })
+
+  const { status, data } = await events.remove(parsedId.data)
+
+  if (status === 400) return res.status(status).json({ error: { ...data } })
+
+  res.status(status).json({ ...data })
 }
