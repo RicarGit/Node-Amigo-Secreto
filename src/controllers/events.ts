@@ -28,7 +28,7 @@ export const createEvent: RequestHandler = async (req, res) => {
   const { title, description } = parsedBody.data
   const { status, data } = await events.create({ title, description })
 
-  if (status === 400) return res.status(400).json({ error: data })
+  if (status === 400) return res.status(400).json({ ...data })
 
   res.status(201).json({ ...data })
 }
@@ -51,7 +51,7 @@ export const updateEvent: RequestHandler = async (req, res) => {
 
   const { status, data } = await events.update(parsedId.data, parsedBody.data)
 
-  if (status === 400) return res.status(status).json({ error: data })
+  if (status === 400) return res.status(status).json({ ...data })
 
   res.status(200).json({ ...data })
 }
@@ -60,11 +60,11 @@ export const deleteEvent: RequestHandler = async (req, res) => {
   const eventIdSchema = z.coerce.number()
   const parsedId = eventIdSchema.safeParse(req.params.id)
 
-  if (!parsedId.success) return res.status(400).json({ error: 'Dados inválidos.' })
+  if (!parsedId.success) return res.status(404).json({ error: 'Não foi fornecido o id do evento.' })
 
   const { status, data } = await events.remove(parsedId.data)
 
-  if (status === 400) return res.status(status).json({ error: { ...data } })
+  if (status === 400) return res.status(status).json({ ...data })
 
   res.status(status).json({ ...data })
 }
