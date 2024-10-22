@@ -26,11 +26,11 @@ export const createEvent: RequestHandler = async (req, res) => {
   if (!parsedBody.success) return res.status(400).json({ error: 'Dados inválidos.' })
 
   const { title, description } = parsedBody.data
-  const newEvent = await events.create({ title, description })
+  const { status, data } = await events.create({ title, description })
 
-  if (!newEvent) return res.status(400).json({ error: 'Ocorreu um erro.' })
+  if (status === 400) return res.status(400).json({ error: data })
 
-  res.status(201).json({ message: 'Evento criado com sucesso.', event: newEvent })
+  res.status(201).json({ ...data })
 }
 
 export const updateEvent: RequestHandler = async (req, res) => {
@@ -49,9 +49,12 @@ export const updateEvent: RequestHandler = async (req, res) => {
   if (!parsedId.success) return res.status(400).json({ error: "Não foi fornecido o id do evento." })
   if (!parsedBody.success) return res.status(400).json({ error: "Dados incorretos ou inexistentes." })
 
-  const updatedEvent = await events.update(parsedId.data, parsedBody.data)
+  const { status, data } = await events.update(parsedId.data, parsedBody.data)
 
-  if (updatedEvent.status === 400) return res.status(updatedEvent.status).json({ error: updatedEvent.data })
+  if (status === 400) return res.status(status).json({ error: data })
+
+  res.status(200).json({ ...data })
+}
 
 export const deleteEvent: RequestHandler = async (req, res) => {
   const eventIdSchema = z.coerce.number()
