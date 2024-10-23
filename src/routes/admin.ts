@@ -1,6 +1,7 @@
 import { Router } from "express"
 import * as auth from '../controllers/auth'
 import * as event from '../controllers/events'
+import * as group from '../controllers/groups'
 
 const router = Router()
 
@@ -15,6 +16,7 @@ router.put('/events/:id', auth.validate, event.updateEvent)
 router.delete('/events/:id', auth.validate, event.deleteEvent)
 
 router.get('/events/:event_id/groups', auth.validate, group.getAllGroups)
+router.get('/events/:event_id/groups/:id', auth.validate, group.getOneGroup)
 
 
 export default router
