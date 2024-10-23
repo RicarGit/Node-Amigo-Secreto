@@ -15,3 +15,21 @@ export const getAllGroups: RequestHandler = async (req, res) => {
 
   res.status(status).json({ ...data })
 }
+
+export const getOneGroup: RequestHandler = async (req, res) => {
+  const groupIdSchema = z.object({
+    id: z.coerce.number(),
+    event_id: z.coerce.number().optional().default(0)
+  })
+
+  const parsedGroupId = groupIdSchema.safeParse(req.params)
+
+  if (!parsedGroupId.data) return res.status(400).json({ error: "Não foi fornecido o id do evento." })
+
+  const { status, data } = await groups.getOne(parsedGroupId.data)
+  const notFoundGroup = Object.keys(data).length <= 0
+
+  if (notFoundGroup) return res.status(404).json({ message: "Grupo não encontrado." })
+
+  res.status(status).json({ ...data })
+}
