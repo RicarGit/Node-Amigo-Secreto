@@ -52,3 +52,11 @@ export const update = ({ id, event_id, name }: UpdateGroupPayload) => {
 
   return response
 }
+
+export const remove = (id: number, event_id: number) => {
+  const response = client.event_Group.delete({ where: { id, event_id } })
+    .then(data => ({ status: 200, data }))
+    .catch(() => ({ status: 400, data: { error: 'Ocorreu um erro ao deletar' } }))
+
+  return response
+}
