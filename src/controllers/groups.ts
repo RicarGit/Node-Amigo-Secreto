@@ -56,3 +56,29 @@ export const createGroup: RequestHandler = async (req, res) => {
 
   res.status(status).json({ ...data })
 }
+
+export const updateGroup: RequestHandler = async (req, res) => {
+  const updateGroupParamsSchema = z.object({
+    id: z.coerce.number(),
+    event_id: z.coerce.number()
+  })
+
+  const updateGroupBodySchema = z.object({
+    name: z.string()
+  })
+
+  const parsedBody = updateGroupBodySchema.safeParse(req.body)
+  const parsedParams = updateGroupParamsSchema.safeParse(req.params)
+
+  if (!parsedParams.success) return res.status(400).json({ error: "Não foi fornecido o id do evento ou grupo." })
+  if (!parsedBody.success) return res.status(400).json({ error: "Dados incorretos ou inexistentes." })
+
+  const { id, event_id } = parsedParams.data
+  const { name } = parsedBody.data
+  const { status, data } = await groups.update({ id, event_id, name })
+
+  if (status === 400) return res.status(status).json({ ...data })
+
+  res.status(200).json({ ...data })
+}
+
