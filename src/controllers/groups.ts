@@ -82,3 +82,20 @@ export const updateGroup: RequestHandler = async (req, res) => {
   res.status(200).json({ ...data })
 }
 
+export const deleteGroup: RequestHandler = async (req, res) => {
+  const deleteGroupParamsSchema = z.object({
+    id: z.coerce.number(),
+    event_id: z.coerce.number()
+  })
+
+  const parsedParams = deleteGroupParamsSchema.safeParse(req.params)
+
+  if (!parsedParams.success) return res.status(404).json({ error: 'Não foi fornecido o id do evento.' })
+
+  const { id, event_id } = parsedParams.data
+  const { status, data } = await groups.remove(id, event_id)
+
+  if (status === 400) return res.status(status).json({ ...data })
+
+  res.status(status).json({ ...data })
+}
