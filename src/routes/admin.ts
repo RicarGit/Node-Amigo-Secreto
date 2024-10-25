@@ -19,5 +19,6 @@ router.get('/events/:event_id/groups', auth.validate, group.getAllGroups)
 router.post('/events/:event_id/groups', auth.validate, group.createGroup)
 router.get('/events/:event_id/groups/:id', auth.validate, group.getOneGroup)
 router.put('/events/:event_id/groups/:id', auth.validate, group.updateGroup)
+router.delete('/events/:event_id/groups/:id', auth.validate, group.deleteGroup)
 
 export default router
