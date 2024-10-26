@@ -18,7 +18,7 @@ type UpdateGroupPayload = {
 }
 
 export const getAll = (event_id: number) => {
-  const response = client.event_Group.findMany({ where: { event_id } })
+  const response = client.event_Group.findMany({ where: { event_id }, orderBy: { id: 'asc' } })
     .then(data => ({ status: 200, data }))
     .catch(() => ({ status: 404, data: { error: 'Ocorreu um erro.' } }))
 
@@ -46,7 +46,7 @@ export const create = async ({ event_id, name }: CreateGroupPayload) => {
 }
 
 export const update = ({ id, event_id, name }: UpdateGroupPayload) => {
-  const response = client.event_Group.update({ where: { id, AND: { event_id } }, data: { name } })
+  const response = client.event_Group.update({ where: { id, event_id }, data: { name } })
     .then(data => ({ status: 200, data }))
     .catch(() => ({ status: 400, data: { error: 'Ocorreu um erro ao atualizar.' } }))
 
