@@ -40,6 +40,32 @@ export const getOneParticipant: RequestHandler = async (req, res) => {
   res.status(status).json({ ...data })
 }
 
+export const createParticipant: RequestHandler = async (req, res) => {
+  const createParticipantParamsSchema = z.object({
+    event_id: z.coerce.number(),
+    event_group: z.coerce.number()
+  })
+
+  const createParticipantBodySchema = z.object({
+    name: z.string(),
+    cpf: z.string().transform(cpf => cpf.replace(/\.|-/gm, ''))
+  })
+
+  const parsedParams = createParticipantParamsSchema.safeParse(req.params)
+  const parsedBody = createParticipantBodySchema.safeParse(req.body)
+
+  if (!parsedParams.success || !parsedBody.success) return res.status(400).json({ error: "Dados incorretos ou inexistentes." })
+
+  const { event_id, event_group } = parsedParams.data
+  const { name, cpf } = parsedBody.data
+  const isParticipantExists = await participants.getOne({ event_id, event_group, cpf })
+
+  if (isParticipantExists.status === 200) return res.status(400).json({ error: "Participante já cadastrado." })
+
+  const { status, data } = await participants.create({ event_id, event_group, name, cpf })
+
+  if (status === 400) return res.status(status).json({ ...data })
+
   res.status(status).json({ ...data })
 }
 
