@@ -22,9 +22,10 @@ export const getAllParticipants: RequestHandler = async (req, res) => {
 
 export const getOneParticipant: RequestHandler = async (req, res) => {
   const participantSchema = z.object({
-    id: z.coerce.number(),
+    id: z.coerce.number().catch(0),
     event_id: z.coerce.number().catch(0),
-    event_group: z.coerce.number().catch(0)
+    event_group: z.coerce.number().catch(0),
+    cpf: z.string().transform(cpf => cpf.replace(/\.|-/gm, '')).optional()
   })
 
   const parsedParticipant = participantSchema.safeParse(req.params)
