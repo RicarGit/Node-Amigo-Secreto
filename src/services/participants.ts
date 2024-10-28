@@ -6,7 +6,9 @@ type ParticipantsIDs = {
 }
 
 interface OneParticipantIDs extends ParticipantsIDs {
-  id: number
+  id?: number
+  cpf?: string
+}
 }
 
 export const getAll = ({ event_id, event_group }: ParticipantsIDs) => {
@@ -17,8 +19,8 @@ export const getAll = ({ event_id, event_group }: ParticipantsIDs) => {
   return response
 }
 
-export const getOne = ({ id, event_id, event_group }: OneParticipantIDs) => {
-  const response = client.participant.findFirstOrThrow({ where: { event_id, event_group, id } })
+export const getOne = ({ id, event_id, event_group, cpf }: OneParticipantIDs) => {
+  const response = client.participant.findFirstOrThrow({ where: { event_id, event_group, OR: [{ id }, { cpf }] } })
     .then(data => ({ status: 200, data }))
     .catch(() => ({ status: 404, data: { error: 'Participante não encontrado.' } }))
 
