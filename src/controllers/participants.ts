@@ -97,3 +97,21 @@ export const updateOneOrManyParticipants: RequestHandler = async (req, res) => {
 
   res.status(200).json({ updated: data })
 }
+
+export const deleteParticipant: RequestHandler = async (req, res) => {
+  const deleteParticipantParamsSchema = z.object({
+    id: z.coerce.number(),
+    event_id: z.coerce.number().or(z.undefined()).catch(undefined),
+    event_group: z.coerce.number().or(z.undefined()).catch(undefined)
+  })
+
+  const parsedParams = deleteParticipantParamsSchema.safeParse(req.params)
+
+  if (!parsedParams.success) return res.status(404).json({ error: "Dados incorretos ou inexistentes." })
+
+  const { status, data } = await participants.remove(parsedParams.data)
+
+  if (status === 400) return res.status(status).json({ ...data })
+
+  res.status(status).json({ ...data })
+}
