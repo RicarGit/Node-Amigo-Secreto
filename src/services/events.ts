@@ -11,7 +11,7 @@ type UpdateEventPayload = {
 }
 
 export const getAll = () => {
-  const response = client.event.findMany()
+  const response = client.event.findMany({ orderBy: { id: 'asc' } })
     .then(data => ({ status: 200, data }))
     .catch(() => ({ status: 404, data: { error: 'Ocorreu um erro.' } }))
 
