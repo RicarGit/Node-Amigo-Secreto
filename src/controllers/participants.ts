@@ -69,3 +69,31 @@ export const createParticipant: RequestHandler = async (req, res) => {
   res.status(status).json({ ...data })
 }
 
+export const updateOneOrManyParticipants: RequestHandler = async (req, res) => {
+  const updateParticipantParamsSchema = z.object({
+    id: z.string().transform(id => isNaN(Number(id)) ? undefined : Number(id)).optional(),
+    event_id: z.coerce.number(),
+    event_group: z.string().transform(id => isNaN(Number(id)) ? undefined : Number(id)).optional()
+  })
+
+  const updateParticipantBodySchema = z.object({
+    name: z.string().optional(),
+    cpf: z.string().transform(cpf => cpf.replace(/\.|-/gm, '')).optional(),
+    matched: z.string().optional()
+  })
+
+  const parsedParams = updateParticipantParamsSchema.safeParse(req.params)
+  const parsedBody = updateParticipantBodySchema.safeParse(req.body)
+
+  if (!parsedParams.success) return res.status(400).json({ error: "Não foi fornecido o id do evento ou grupo." })
+  if (!parsedBody.success) return res.status(400).json({ error: "Dados incorretos." })
+
+  const { id, event_id, event_group } = parsedParams.data
+  const { name, cpf, matched } = parsedBody.data
+
+  const { status, data } = await participants.update({ id, event_id, event_group, name, cpf, matched })
+
+  if (status === 400) return res.status(status).json({ ...data })
+
+  res.status(200).json({ ...data })
+}
