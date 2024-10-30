@@ -71,9 +71,9 @@ export const createParticipant: RequestHandler = async (req, res) => {
 
 export const updateOneOrManyParticipants: RequestHandler = async (req, res) => {
   const updateParticipantParamsSchema = z.object({
-    id: z.string().transform(id => isNaN(Number(id)) ? undefined : Number(id)).optional(),
+    id: z.coerce.number().or(z.undefined()).catch(undefined),
     event_id: z.coerce.number(),
-    event_group: z.string().transform(id => isNaN(Number(id)) ? undefined : Number(id)).optional()
+    event_group: z.coerce.number().or(z.undefined()).catch(undefined)
   })
 
   const updateParticipantBodySchema = z.object({
