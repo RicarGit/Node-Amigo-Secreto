@@ -12,6 +12,11 @@ type UpdateEventPayload = {
   grouped?: boolean
 }
 
+type SortedList = {
+  id: number,
+  match: number
+}
+
 export const getAll = () => {
   const response = client.event.findMany({ orderBy: { id: 'asc' } })
     .then(data => ({ status: 200, data }))
@@ -59,7 +64,7 @@ export const beginMatch = async (id: number): Promise<boolean> => {
     const participantsList = await participants.getAll({ event_id: id })
 
     if (participantsList.status === 200 && Array.isArray(participantsList.data)) {
-      let sortedList: { id: number, match: number }[] = []
+      let sortedList: SortedList[] = []
       let sortable: number[] = []
 
       let attempts = 0
