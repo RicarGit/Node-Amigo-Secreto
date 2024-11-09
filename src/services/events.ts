@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client"
 import client from "../lib/prisma-client"
 
 import * as participants from "../services/participants"
+import { encryptMatch } from "../utils/match"
 
 type CreateEventPayload = Pick<Prisma.EventCreateInput, 'title' | 'description'>
 
@@ -109,16 +110,17 @@ export const beginMatch = async (id: number): Promise<boolean> => {
         }
       }
 
-      console.log(`ATTEMPTS: ${attempts}`)
-      console.log(`MAX ATTEMPTS: ${maxAttenpts}`)
-      console.log(sortedList)
+      if (attempts < maxAttenpts) {
+        for (let i in sortedList) {
+          await participants.update({
+            id: sortedList[i].id,
+            event_id: id,
+            matched: encryptMatch(sortedList[i].match)
+          })
+        }
 
-      // if (attempts < maxAttenpts) {
-      //   for (let i in sortedList) {
-      //     await participants.update({ id: sortedList[i].id, event_id: id, matched: '' })
-
-      //   }
-      // }
+        return true
+      }
     }
   }
 
