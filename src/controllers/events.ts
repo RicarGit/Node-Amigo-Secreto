@@ -1,5 +1,6 @@
 import { RequestHandler } from "express"
 import * as events from '../services/events'
+import * as participants from '../services/participants'
 import { z } from "zod"
 
 export const getAllEvents: RequestHandler = async (_, res) => {
@@ -52,6 +53,16 @@ export const updateEvent: RequestHandler = async (req, res) => {
   const { status, data } = await events.update(parsedId.data, parsedBody.data)
 
   if (status === 400) return res.status(status).json({ ...data })
+
+  if (('id' in data) && data.status) {
+    const result = await events.beginMatch(parsedId.data)
+
+    if (!result) {
+      return res.json({ error: "Grupos impossíveis de sortear" })
+    }
+  } else {
+    await participants.update({ event_id: parsedId.data, matched: "" })
+  }
 
   res.status(200).json({ ...data })
 }
