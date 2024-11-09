@@ -3,7 +3,7 @@ import * as groups from "../services/groups"
 
 type ParticipantsIDs = {
   event_id: number
-  event_group: number
+  event_group?: number
 }
 
 interface OneParticipantIDs extends ParticipantsIDs {

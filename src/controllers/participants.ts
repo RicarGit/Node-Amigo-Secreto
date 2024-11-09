@@ -5,7 +5,7 @@ import { z } from "zod"
 export const getAllParticipants: RequestHandler = async (req, res) => {
   const paramsSchema = z.object({
     event_id: z.coerce.number(),
-    event_group: z.coerce.number()
+    event_group: z.coerce.number().optional()
   })
 
   const parsedParams = paramsSchema.safeParse(req.params)
