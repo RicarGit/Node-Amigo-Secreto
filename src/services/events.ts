@@ -1,6 +1,8 @@
 import { Prisma } from "@prisma/client"
 import client from "../lib/prisma-client"
 
+import * as participants from "../services/participants"
+
 type CreateEventPayload = Pick<Prisma.EventCreateInput, 'title' | 'description'>
 
 type UpdateEventPayload = {
@@ -48,4 +50,72 @@ export const remove = (id: number) => {
     .catch(() => ({ status: 400, data: { error: 'Ocorreu um erro ao deletar.' } }))
 
   return response
+}
+
+export const beginMatch = async (id: number): Promise<boolean> => {
+  const groupedEvents = await client.event.findFirst({ where: { id }, select: { grouped: true } })
+
+  if (groupedEvents) {
+    const participantsList = await participants.getAll({ event_id: id })
+
+    if (participantsList.status === 200 && Array.isArray(participantsList.data)) {
+      let sortedList: { id: number, match: number }[] = []
+      let sortable: number[] = []
+
+      let attempts = 0
+      let maxAttenpts = participantsList.data.length
+      let keepTrying = true
+
+      while (keepTrying && attempts < maxAttenpts) {
+        keepTrying = false
+        attempts++
+        sortedList = []
+        sortable = participantsList.data.map(participant => participant.id)
+
+        for (let i in participantsList.data) {
+          let sortableFiltered: number[] = sortable
+
+          if (groupedEvents.grouped) {
+            sortableFiltered = sortable.filter(sortableItem => {
+              let sortableParticipant = Array.isArray(participantsList.data) && participantsList.data.find(participant => participant.id === sortableItem)
+
+              return Array.isArray(participantsList.data) &&
+                sortableParticipant &&
+                participantsList.data[i].event_group !== sortableParticipant.event_group
+            })
+          }
+
+          if ((sortableFiltered.length === 0) || (sortableFiltered.length === 1 && participantsList.data[i].id === sortableFiltered[0])) {
+            keepTrying = true
+          } else {
+            let sortedIndex = Math.floor(Math.random() * sortableFiltered.length)
+
+            while (sortableFiltered[sortedIndex] === participantsList.data[i].id) {
+              sortedIndex = Math.floor(Math.random() * sortableFiltered.length)
+            }
+
+            sortedList.push({
+              id: participantsList.data[i].id,
+              match: sortableFiltered[sortedIndex]
+            })
+
+            sortable = sortable.filter(item => item !== sortableFiltered[sortedIndex])
+          }
+        }
+      }
+
+      console.log(`ATTEMPTS: ${attempts}`)
+      console.log(`MAX ATTEMPTS: ${maxAttenpts}`)
+      console.log(sortedList)
+
+      // if (attempts < maxAttenpts) {
+      //   for (let i in sortedList) {
+      //     await participants.update({ id: sortedList[i].id, event_id: id, matched: '' })
+
+      //   }
+      // }
+    }
+  }
+
+  return false
 }
