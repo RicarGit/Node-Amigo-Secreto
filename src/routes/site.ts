@@ -2,8 +2,6 @@ import { Router } from "express"
 
 const router = Router()
 
-router.get('/', (req, res) => {
-  res.status(200).json({ ping: 'pong' })
-})
+router.get('/ping', (_, res) => res.status(200).json({ ping: 'pong' }))
 
 export default router

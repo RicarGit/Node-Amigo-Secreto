@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.all('*', requestLog)
 
-app.use('/ping', siteRoutes)
+app.use('/', siteRoutes)
 app.use('/admin', adminRoutes)
 
 const runServer = (port: number, server: http.Server) => {
