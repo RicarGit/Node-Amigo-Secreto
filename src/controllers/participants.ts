@@ -2,6 +2,8 @@ import { RequestHandler } from "express"
 import * as participants from '../services/participants'
 import { z } from "zod"
 
+import { cpfFormatter } from "../utils/cpfFormatter"
+
 export const getAllParticipants: RequestHandler = async (req, res) => {
   const paramsSchema = z.object({
     event_id: z.coerce.number(),
@@ -25,7 +27,7 @@ export const getOneParticipant: RequestHandler = async (req, res) => {
     id: z.coerce.number().catch(0),
     event_id: z.coerce.number().catch(0),
     event_group: z.coerce.number().catch(0),
-    cpf: z.string().transform(cpf => cpf.replace(/\.|-/gm, '')).optional()
+    cpf: z.string().transform(cpfFormatter).optional()
   })
 
   const parsedParticipant = participantSchema.safeParse(req.params)
@@ -48,7 +50,7 @@ export const createParticipant: RequestHandler = async (req, res) => {
 
   const createParticipantBodySchema = z.object({
     name: z.string(),
-    cpf: z.string().transform(cpf => cpf.replace(/\.|-/gm, ''))
+    cpf: z.string().transform(cpfFormatter)
   })
 
   const parsedParams = createParticipantParamsSchema.safeParse(req.params)
@@ -78,7 +80,7 @@ export const updateOneOrManyParticipants: RequestHandler = async (req, res) => {
 
   const updateParticipantBodySchema = z.object({
     name: z.string().optional(),
-    cpf: z.string().transform(cpf => cpf.replace(/\.|-/gm, '')).optional(),
+    cpf: z.string().transform(cpfFormatter).optional(),
     matched: z.string().optional()
   })
 
