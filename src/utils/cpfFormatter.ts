@@ -1,0 +1,1 @@
+export const cpfFormatter = (cpf: string) => cpf.replace(/\.|-/gm, '')
