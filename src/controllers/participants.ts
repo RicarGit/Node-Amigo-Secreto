@@ -3,6 +3,7 @@ import * as participants from '../services/participants'
 import { z } from "zod"
 
 import { cpfFormatter } from "../utils/cpfFormatter"
+import { decryptMatch } from "../utils/match"
 
 export const getAllParticipants: RequestHandler = async (req, res) => {
   const paramsSchema = z.object({
@@ -116,4 +117,45 @@ export const deleteParticipant: RequestHandler = async (req, res) => {
   if (status === 400) return res.status(status).json({ ...data })
 
   res.status(status).json({ ...data })
+}
+
+export const searchParticipantMatch: RequestHandler = async (req, res) => {
+  const searchParamsSchema = z.object({
+    event_id: z.coerce.number()
+  })
+
+  const searchQuerySchema = z.object({
+    cpf: z.string().transform(cpfFormatter)
+  })
+
+  const parsedParam = searchParamsSchema.safeParse(req.params)
+  const parsedQuery = searchQuerySchema.safeParse(req.query)
+
+  if (!parsedQuery.success || !parsedParam.success) return res.status(400).json({ error: "Dados inválidos." })
+
+  const participant = await participants.getOne({ event_id: parsedParam.data.event_id, cpf: parsedQuery.data.cpf })
+
+  if (participant.status === 200 && ('matched' in participant.data && participant.data.matched)) {
+    const matchId = decryptMatch(participant.data.matched)
+
+    const matchedParticipants = await participants.getOne({
+      event_id: parsedParam.data.event_id,
+      id: matchId
+    })
+
+    if (matchedParticipants.status === 200 && ('matched' in matchedParticipants.data)) {
+      return res.status(200).json({
+        person: {
+          id: participant.data.id,
+          name: participant.data.name
+        },
+        matchedParticipant: {
+          id: matchedParticipants.data.id,
+          name: matchedParticipants.data.name
+        }
+      })
+    }
+  }
+
+  res.json({ error: "Ocorreu um erro." })
 }
